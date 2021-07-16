@@ -1,0 +1,116 @@
+{
+    "StartAt": "GlueDataProcessingStep",
+    "States": {
+      "GlueDataProcessingStep": {
+        "Parameters": {
+          "JobName": "Job-Etl-Glue",
+          "Arguments": {
+            "--s3_input_data_path": "s3://finnancial-informations/medicare-dataset/",
+            "--s3_processed_data_path": "s3://finnancial-informations/processed"
+          }
+        },
+        "Resource": "arn:aws:states:::glue:startJobRun.sync",
+        "Type": "Task",
+        "Next": "TrainStep"
+      },
+      "TrainStep": {
+        "Resource": "arn:aws:states:::sagemaker:createTrainingJob.sync",
+        "Parameters": {
+          "AlgorithmSpecification": {
+            "TrainingImage": "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-xgboost:1.2-1",
+            "TrainingInputMode": "File"
+          },
+          "OutputDataConfig": {
+            "S3OutputPath": "s3://finnancial-informations/"
+          },
+          "StoppingCondition": {
+            "MaxRuntimeInSeconds": 86400
+          },
+          "ResourceConfig": {
+            "InstanceCount": 1,
+            "InstanceType": "ml.m4.4xlarge",
+            "VolumeSizeInGB": 5
+          },
+          "RoleArn": "arn:aws:iam::133562267374:role/service-role/AmazonSageMaker-ExecutionRole-20210715T185402",
+          "InputDataConfig": [
+            {
+              "DataSource": {
+                "S3DataSource": {
+                  "S3DataType": "S3Prefix",
+                  "S3Uri": "s3://finnancial-informations/train",
+                  "S3DataDistributionType": "FullyReplicated"
+                }
+              },
+              "ContentType": "text/csv",
+              "CompressionType": "None",
+              "ChannelName": "train"
+            },
+            {
+              "DataSource": {
+                "S3DataSource": {
+                  "S3DataType": "S3Prefix",
+                  "S3Uri": "s3://finnancial-informations/validation",
+                  "S3DataDistributionType": "FullyReplicated"
+                }
+              },
+              "ContentType": "text/csv",
+              "CompressionType": "None",
+              "ChannelName": "validation"
+            }
+          ],
+          "HyperParameters": {
+            "objective": "reg:linear",
+            "num_round": "50",
+            "max_depth": "5",
+            "eta": "0.2",
+            "gamma": "4",
+            "min_child_weight": "6",
+            "subsample": "0.7"
+          },
+          "TrainingJobName": "glue-sagemaker-training-stepfunction"
+        },
+        "Type": "Task",
+        "Next": "SaveModel"
+      },
+      "SaveModel": {
+        "Parameters": {
+          "ExecutionRoleArn": "arn:aws:iam::133562267374:role/service-role/AmazonSageMaker-ExecutionRole-20210715T185402",
+          "ModelName": "sagemaker-xgb-model-stepfunction",
+          "PrimaryContainer": {
+            "Environment": {},
+            "Image": "246618743249.dkr.ecr.us-west-2.amazonaws.com/sagemaker-xgboost:1.2-1",
+            "ModelDataUrl.$": "$['ModelArtifacts']['S3ModelArtifacts']"
+          }
+        },
+        "Resource": "arn:aws:states:::sagemaker:createModel",
+        "Type": "Task",
+        "Next": "BatchPredictionStep"
+      },
+      "BatchPredictionStep": {
+        "Resource": "arn:aws:states:::sagemaker:createTransformJob.sync",
+        "Parameters": {
+          "TransformJobName": "glue-sagemaker-job-transform-stepfunction",
+          "ModelName": "sagemaker-xgb-model-stepfunction",
+          "TransformInput": {
+            "DataSource": {
+              "S3DataSource": {
+                "S3DataType": "S3Prefix",
+                "S3Uri": "s3://finnancial-informations/test"              
+              }
+            },
+            "CompressionType": "None",
+            "ContentType": "text/csv"          
+          },
+          "TransformOutput": {
+            "S3OutputPath": "s3://finnancial-informations/glue-sagemaker-job-output-function"
+          },
+          "TransformResources": {
+            "InstanceCount": 1,
+            "InstanceType": "ml.m5.large"
+          }
+        },
+        "Type": "Task",
+        "End": true
+      }
+    }
+  }
