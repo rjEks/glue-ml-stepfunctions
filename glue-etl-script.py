@@ -14,7 +14,7 @@ sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 job = Job(glueContext)
-s3_input_data_path = 's3://finnancial-informations/medicare-dataset/'
+s3_input_data_path = 's3://bucket-name/medicare-dataset/'
 
 input_df = spark.read.load(s3_input_data_path, format="csv", inferSchema=True, header=False)
 
@@ -26,9 +26,9 @@ train_df = splits[0]
 validation_df = splits[1]
 test_df = splits[2]
 
-train_data_output_path = f's3://finnancial-informations/train'
-validation_data_output_path = f's3://finnancial-informations/validation'
-test_data_output_path = f's3://finnancial-informations/test'
+train_data_output_path = f's3://bucket-name/train'
+validation_data_output_path = f's3://bucket-name/validation'
+test_data_output_path = f's3://bucket-name/test'
  
 print(f"Dados treino - output path: {train_data_output_path}")
 print(f"Dados de validacao - output path: {validation_data_output_path}")
