@@ -4,7 +4,7 @@ glue = boto3.client('glue')
 glue_job_name = 'Job-Etl-Glue'
  
  
-s3_script_path = 's3://finnancial-informations/gluescript/glue-etl-processing.py'
+s3_script_path = 's3://bucket-name/gluescript/glue-etl-processing.py'
 my_glue_role = 'GlueJobRole' # Nao esquecer de Criar a Role
  
  
