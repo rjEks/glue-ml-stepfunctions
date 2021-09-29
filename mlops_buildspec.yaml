@@ -15,7 +15,7 @@ phases:
     commands:
       - echo "[+] Installing dependencies...."
       - echo "Starting SAM packaging `date` in `pwd`"
-      - echo "aws cloudformation package --template-file template.yaml --s3-bucket $BUILD_OUTPUT_BUCKET --output-template-file packaged.yaml"
+      - echo "sam package --template-file template.yml --output-template-file packaged-template.yml"
   post_build:
     commands:
       - echo "SAM packaging completed on `date`"
