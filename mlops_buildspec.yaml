@@ -19,9 +19,9 @@ phases:
   post_build:
     commands:
       - echo "SAM packaging completed on `date`"
-  artifacts:
-    files:
-      - packaged-template.yml
+artifacts:
+  files:
+    - packaged-template.yml
 
 
 
