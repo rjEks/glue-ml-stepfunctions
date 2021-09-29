@@ -8,17 +8,20 @@ phases:
       # - Alternatively: https://www.owasp.org/index.php/OWASP_Dependency_Check
   pre_build:
     commands:
-      - pip install pandas requests cdk
+      - pip install pandas requests
       - npm install -g aws-cdk
       - cdk --version    
   build:
     commands:
       - echo "[+] Installing dependencies...."
       - echo "Starting SAM packaging `date` in `pwd`"
-      - echo "sam package --template-file template.yml --output-template-file packaged-template.yml"
+      - sam package --template-file template.yml --output-template-file packaged-template.yml
   post_build:
     commands:
       - echo "SAM packaging completed on `date`"
+  artifacts:
+  files:
+    - packaged-template.yml
 
 
 
