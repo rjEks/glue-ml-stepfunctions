@@ -20,8 +20,8 @@ phases:
     commands:
       - echo "SAM packaging completed on `date`"
   artifacts:
-  files:
-    - packaged-template.yml
+    files:
+      - packaged-template.yml
 
 
 
