@@ -1,0 +1,26 @@
+Type: AWS::Serverless::Function
+
+Properties:
+  Handler: index.handler
+  Runtime: python3.6
+  InlineCode: |
+    def handler(event, context):
+      print("Hello, world!")
+  ReservedConcurrentExecutions: 30
+  Tracing: Active
+  Timeout: 120
+  Policies:
+    - AWSLambdaExecute
+    - Version: '2012-10-17' 
+      Statement:
+        - Effect: Allow
+          Action:
+            - s3:GetObject
+            - s3:GetObjectACL
+          Resource: 'arn:aws:s3:::finnancial-informations/*'
+  Events:
+    ApiEvent:
+      Type: Api
+      Properties:
+        Path: /path
+        Method: get
