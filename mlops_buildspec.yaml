@@ -14,7 +14,7 @@ phases:
       - echo "[+] Installing dependencies...."
       - echo "Starting SAM packaging `date` in `pwd`"
       - sam package --template-file template.yml --output-template-file packaged-template.yml
-      - sam deploy --template-file packaged-template.yml --stack-name sammlops01 --capabilities CAPABILITY_IAM 
+      - sam deploy --template-file packaged-template.yml --stack-name sammlops02 --capabilities CAPABILITY_IAM 
   post_build:
     commands:
       - echo "SAM packaging completed on `date`"
