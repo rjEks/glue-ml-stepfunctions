@@ -18,7 +18,7 @@ Resources:
               Action:
                 - s3:GetObject
                 - s3:GetObjectACL
-              Resource: 'arn:aws:s3:::finnancial-informations/*'
+              Resource: 'arn:aws:s3:::finnancial-informations/*'              
       Events:
         ApiEvent:
           Type: Api
